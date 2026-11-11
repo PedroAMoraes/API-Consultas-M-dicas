@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'api_consultas_medicas.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'nome_do_banco',
+        'USER': 'meu_usuario',
+        'PASSWORD': 'minha_senha',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
