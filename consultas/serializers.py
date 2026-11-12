@@ -11,11 +11,11 @@ class ConsultaSerializer(serializers.ModelSerializer):
 
     info_profissional = ProfissionalSerializer(source='profissional', read_only=True)
     
-    id_profissional = serializers.PrimaryKeyRelatedField(
+    profissional = serializers.PrimaryKeyRelatedField(
         queryset=Profissional.objects.all(),
         write_only=True
     )
 
     class Meta:
         model = Consulta
-        fields = ('id','data','id_profissional','info_profissional')
+        fields = ('id','data','profissional','info_profissional')
