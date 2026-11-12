@@ -7,4 +7,5 @@ urlpatterns = [
     path('all/', views.get_all_profissionais, name='get_all_profissionais'),
     path('update/<int:pk>/', views.update_profissional, name='update_profissional'),
     path('profissional/<int:pk>/delete/', views.delete_profissional, name='delete_profissional'),
+    path('force_error/', views.my_test_500_view, name='teste-error'),
 ]

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
-
+from drf_api_logger import API_LOGGER_SIGNAL
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "drf_api_logger",
     'rest_framework',
     'profissionais',
     'consultas',
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -169,3 +171,16 @@ CORS_ALLOWED_ORIGINS = [
     for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
     if origin.strip()
 ]
+
+DRF_API_LOGGER_DATABASE = True
+DRF_API_LOGGER_EXCLUDE_KEYS = ["password", "token", "access", "refresh", "secret", "api_key","authorization"]
+DRF_API_LOGGER_MAX_REQUEST_BODY_SIZE = 32768
+DRF_API_LOGGER_MAX_RESPONSE_BODY_SIZE = 65536
+DRF_API_LOGGER_ENABLE_TRACING = True
+
+
+API_LOGGER_SIGNAL.listen 
+API_LOGGER_SIGNAL.listen 
+
+API_LOGGER_SIGNAL.listen 
+
