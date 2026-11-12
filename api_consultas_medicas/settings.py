@@ -11,21 +11,38 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def required_env(name):
+    value = os.environ.get(name)
+    if not value:
+        raise ImproperlyConfigured(f"Set the {name} environment variable.")
+    return value
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#pek=7@*8*^7e2m_&hkyksxsn+-dquox0jdgdjd^%ps3-%g^o0'
+load_dotenv()
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = required_env('DJANGO_SECRET_KEY')
 
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get('DJANGO_DEBUG', 'false').strip().lower() in {
+    '1', 'true', 'yes', 'on'
+}
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -78,11 +95,11 @@ WSGI_APPLICATION = 'api_consultas_medicas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'NAME': required_env('DB_NAME'),
+        'USER': required_env('DB_USER'),
+        'PASSWORD': required_env('DB_PASSWORD'),
+        'HOST': required_env('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -132,3 +149,17 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.IsAuthenticated',
+        ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    
+    
+}
+
