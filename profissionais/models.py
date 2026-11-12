@@ -1,7 +1,11 @@
 from django.db import models
 
 # Create your models here.
-class Post(models.Model):
-    title = models.CharField(max_length=250)
-    content = models.TextField()
-    pub_date = models.DateTimeField(auto_now_add=True)
+class Profissional(models.Model):
+    nome = models.CharField(max_length=255)
+    profissao = models.CharField(max_length=255)
+    endereco = models.CharField(max_length=255)
+    contato = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
