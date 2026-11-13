@@ -41,8 +41,3 @@ def delete_profissional(request, pk):
     profissional = get_object_or_404(Profissional, pk=pk)
     profissional.delete()
     return Response(status=status.HTTP_202_ACCEPTED)
-
-@api_view(['GET'])
-def my_test_500_view(request):
-    # Return an "Internal Server Error" 500 response code.
-    return Response(status=500)
