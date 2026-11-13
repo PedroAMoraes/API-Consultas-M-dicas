@@ -49,7 +49,7 @@ def get_consulta(request, pk):
     return Response(ConsultaSerializer(consulta).data)
 
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def update_consulta(request, pk):
     consulta = get_object_or_404(Consulta.objects, pk=pk)
     data = ConsultaSerializer(instance= consulta, data= request.data)

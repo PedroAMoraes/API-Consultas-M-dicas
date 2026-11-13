@@ -47,7 +47,7 @@ def get_profissional(request, pk):
     return Response(ProfissionalSerializer(profissional).data)
 
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def update_profissional(request, pk):
     profissional = get_object_or_404(Profissional.objects, pk= pk)
     data = ProfissionalSerializer(instance= profissional, data= request.data)
