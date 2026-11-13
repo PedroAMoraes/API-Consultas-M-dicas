@@ -1,10 +1,15 @@
 from django.shortcuts import get_object_or_404, render
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 from rest_framework import serializers, status
+from rest_framework.exceptions import ValidationError
+from rest_framework.settings import api_settings
 
-from consultas.models import Consulta
-from consultas.serializers import ConsultaSerializer
+from .filters import ConsultaFilter
+from .models import Consulta
+from .serializers import ConsultaSerializer
 
 @api_view(['POST'])
 def add_consulta(request):
@@ -17,20 +22,26 @@ def add_consulta(request):
    
     
 
-@api_view(['GET'])
-def get_all_consultas(request):
-    filtros = serializers.Serializer(data=request.query_params)
-    filtros.fields['profissional'] = serializers.IntegerField(required=False, min_value=1)
-    filtros.is_valid(raise_exception=True)
+class ConsultaslListView(ListAPIView):
+    queryset = Consulta.objects.all()
+    serializer_class = ConsultaSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ConsultaFilter
 
-    consultas = Consulta.objects.select_related('profissional').all()
-
-    profissional_id = filtros.validated_data.get('profissional')
-    if profissional_id is not None:
-        consultas = consultas.filter(profissional_id=profissional_id)
-
-    serializer = ConsultaSerializer(consultas, many=True)
-    return Response(serializer.data)
+    def filter_queryset(self, queryset):
+                allowed = set(self.filterset_class.base_filters)
+                if api_settings.URL_FORMAT_OVERRIDE:
+                    allowed.add(api_settings.URL_FORMAT_OVERRIDE)
+    
+                unknown = set(self.request.query_params.keys()) - allowed
+                if unknown:
+                    raise ValidationError({
+                        'query_params': (
+                            f"Filtro(s) inválido(s): {', '.join(sorted(unknown))}"
+                        )
+                    })
+    
+                return super().filter_queryset(queryset)
 
 @api_view(['GET'])
 def get_consulta(request, pk):

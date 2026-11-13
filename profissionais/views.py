@@ -1,10 +1,15 @@
 from django.shortcuts import get_object_or_404, render
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 from rest_framework import serializers, status
+from rest_framework.exceptions import ValidationError
+from rest_framework.settings import api_settings
 
-from profissionais.models import Profissional
-from profissionais.serializers import ProfissionalSerializer
+from .filters import ProfissionalFilter
+from .models import Profissional
+from .serializers import ProfissionalSerializer
 
 @api_view(['POST'])
 def add_profissional(request):
@@ -14,18 +19,27 @@ def add_profissional(request):
     profissional.save()
     return Response(profissional.data)
 
-@api_view(['GET'])
-def get_all_profissionais(request):
-    if request.query_params:
-        profissionais = Profissional.objects.filter(**request.query_params.dict())
-    else:
-        profissionais = Profissional.objects.all()
+class ProfissionaisListView(ListAPIView):
+    queryset = Profissional.objects.all()
+    serializer_class = ProfissionalSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProfissionalFilter
 
-    if profissionais:
-        serializer = ProfissionalSerializer(profissionais, many=True)
-        return Response(serializer.data)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    def filter_queryset(self, queryset):
+                allowed = set(self.filterset_class.base_filters)
+                if api_settings.URL_FORMAT_OVERRIDE:
+                    allowed.add(api_settings.URL_FORMAT_OVERRIDE)
+    
+                unknown = set(self.request.query_params.keys()) - allowed
+                if unknown:
+                    raise ValidationError({
+                        'query_params': (
+                            f"Filtro(s) inválido(s): {', '.join(sorted(unknown))}"
+                        )
+                    })
+    
+                return super().filter_queryset(queryset)
+
 
 @api_view(['GET'])
 def get_profissional(request, pk):
