@@ -186,6 +186,9 @@ DRF_API_LOGGER_MAX_REQUEST_BODY_SIZE = 32768
 DRF_API_LOGGER_MAX_RESPONSE_BODY_SIZE = 65536
 DRF_API_LOGGER_ENABLE_TRACING = True
 
+DRF_API_LOGGER_POLICY_FUNC = (
+    "api_consultas_medicas.api_logger_policy.metadata_only_policy"
+)
 
 LOGGING = {
     'version': 1,
