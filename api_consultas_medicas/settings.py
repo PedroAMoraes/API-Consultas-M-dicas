@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 from datetime import timedelta
 
-from drf_api_logger import API_LOGGER_SIGNAL
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -188,9 +187,22 @@ DRF_API_LOGGER_MAX_RESPONSE_BODY_SIZE = 65536
 DRF_API_LOGGER_ENABLE_TRACING = True
 
 
-API_LOGGER_SIGNAL.listen 
-API_LOGGER_SIGNAL.listen 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
 
-API_LOGGER_SIGNAL.listen 
 
 DATETIME_FORMAT = "Y-m-d H:i"
