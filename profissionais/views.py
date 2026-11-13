@@ -10,9 +10,6 @@ from profissionais.serializers import ProfissionalSerializer
 def add_profissional(request):
     profissional = ProfissionalSerializer(data = request.data)
 
-    if Profissional.objects.filter(**request.data).exists():
-        raise serializers.ValidationError('Dados existentes')
-
     profissional.is_valid(raise_exception=True)
     profissional.save()
     return Response(profissional.data)

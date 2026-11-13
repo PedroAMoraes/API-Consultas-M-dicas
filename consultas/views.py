@@ -10,8 +10,6 @@ from consultas.serializers import ConsultaSerializer
 def add_consulta(request):
     consulta = ConsultaSerializer(data = request.data)
 
-    if Consulta.objects.filter(**request.data).exists():
-        raise serializers.ValidationError('Dados existentes')
 
     consulta.is_valid(raise_exception=True)
     consulta.save()
@@ -21,27 +19,27 @@ def add_consulta(request):
 
 @api_view(['GET'])
 def get_all_consultas(request):
-    if request.query_params:
-        consultas = Consulta.objects.filter(**request.query_params.dict())
-    else:
-        consultas = Consulta.objects.all()
+    filtros = serializers.Serializer(data=request.query_params)
+    filtros.fields['profissional'] = serializers.IntegerField(required=False, min_value=1)
+    filtros.is_valid(raise_exception=True)
 
-    if consultas:
-        serializer = ConsultaSerializer(consultas, many=True)
-        return Response(serializer.data)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    consultas = Consulta.objects.select_related('profissional').all()
+
+    profissional_id = filtros.validated_data.get('profissional')
+    if profissional_id is not None:
+        consultas = consultas.filter(profissional_id=profissional_id)
+
+    serializer = ConsultaSerializer(consultas, many=True)
+    return Response(serializer.data)
 
 @api_view(['POST'])
 def update_consulta(request, pk):
     consulta = Consulta.objects.get(pk=pk)
     data = ConsultaSerializer(instance= consulta, data= request.data)
 
-    if data.is_valid(raise_exception=True):
-        data.save()
-        return Response(data.data)
-    else:
-        return Response(status= status.HTTP_404_NOT_FOUND)
+    data.is_valid(raise_exception=True)
+    data.save()
+    return Response(data.data)
     
 @api_view(['DELETE'])
 def delete_consulta(request, pk):
