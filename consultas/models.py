@@ -2,7 +2,7 @@ from django.db import models
 from profissionais.models import Profissional
 # Create your models here.
 class Consulta(models.Model):
-    data = models.CharField(max_length=50)
+    data = models.DateTimeField()
     profissional = models.ForeignKey(Profissional, on_delete=models.PROTECT, related_name='consultas')
 
     def __str__(self):

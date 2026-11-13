@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
+from datetime import timedelta
+
 from drf_api_logger import API_LOGGER_SIGNAL
 from pathlib import Path
 from dotenv import load_dotenv
@@ -166,6 +168,12 @@ REST_FRAMEWORK = {
     
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
@@ -184,3 +192,4 @@ API_LOGGER_SIGNAL.listen
 
 API_LOGGER_SIGNAL.listen 
 
+DATETIME_FORMAT = "Y-m-d H:i"
