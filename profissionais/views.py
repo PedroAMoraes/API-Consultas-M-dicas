@@ -29,14 +29,12 @@ def get_all_profissionais(request):
 
 @api_view(['POST'])
 def update_profissional(request, pk):
-    profissional = Profissional.objects.get(pk=pk)
+    profissional = get_object_or_404(Profissional.objects, pk= pk)
     data = ProfissionalSerializer(instance= profissional, data= request.data)
 
-    if data.is_valid(raise_exception=True):
-        data.save()
-        return Response(data.data)
-    else:
-        return Response(status= status.HTTP_404_NOT_FOUND)
+    data.is_valid(raise_exception=True)
+    data.save()
+    return Response(data.data)
 
 @api_view(['DELETE'])
 def delete_profissional(request, pk):
