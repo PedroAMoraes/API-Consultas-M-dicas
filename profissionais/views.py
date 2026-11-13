@@ -27,6 +27,12 @@ def get_all_profissionais(request):
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+def get_profissional(request, pk):
+    profissional = get_object_or_404(Profissional.objects, pk= pk)
+    return Response(ProfissionalSerializer(profissional).data)
+
+
 @api_view(['POST'])
 def update_profissional(request, pk):
     profissional = get_object_or_404(Profissional.objects, pk= pk)
