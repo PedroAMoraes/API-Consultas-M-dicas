@@ -13,11 +13,9 @@ def add_profissional(request):
     if Profissional.objects.filter(**request.data).exists():
         raise serializers.ValidationError('Dados existentes')
 
-    if profissional.is_valid():
-        profissional.save()
-        return Response(profissional.data)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    profissional.is_valid(raise_exception=True)
+    profissional.save()
+    return Response(profissional.data)
 
 @api_view(['GET'])
 def get_all_profissionais(request):
@@ -37,7 +35,7 @@ def update_profissional(request, pk):
     profissional = Profissional.objects.get(pk=pk)
     data = ProfissionalSerializer(instance= profissional, data= request.data)
 
-    if data.is_valid():
+    if data.is_valid(raise_exception=True):
         data.save()
         return Response(data.data)
     else:

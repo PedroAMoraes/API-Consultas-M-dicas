@@ -13,11 +13,10 @@ def add_consulta(request):
     if Consulta.objects.filter(**request.data).exists():
         raise serializers.ValidationError('Dados existentes')
 
-    if consulta.is_valid():
-        consulta.save()
-        return Response(consulta.data)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    consulta.is_valid(raise_exception=True)
+    consulta.save()
+    return Response(consulta.data, status=status.HTTP_201_CREATED)
+   
     
 
 @api_view(['GET'])
@@ -38,7 +37,7 @@ def update_consulta(request, pk):
     consulta = Consulta.objects.get(pk=pk)
     data = ConsultaSerializer(instance= consulta, data= request.data)
 
-    if data.is_valid():
+    if data.is_valid(raise_exception=True):
         data.save()
         return Response(data.data)
     else:
