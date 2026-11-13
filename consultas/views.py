@@ -32,9 +32,10 @@ def get_all_consultas(request):
     serializer = ConsultaSerializer(consultas, many=True)
     return Response(serializer.data)
 
+
 @api_view(['POST'])
 def update_consulta(request, pk):
-    consulta = Consulta.objects.get(pk=pk)
+    consulta = get_object_or_404(Consulta.objects, pk=pk)
     data = ConsultaSerializer(instance= consulta, data= request.data)
 
     data.is_valid(raise_exception=True)
