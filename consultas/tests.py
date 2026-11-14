@@ -2,10 +2,8 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.dateparse import parse_datetime
 from rest_framework.test import APITestCase
-import json
 from consultas.models import Consulta
 from profissionais.models import Profissional
-
 
 
 class ConsultaAPITests(APITestCase):
@@ -45,7 +43,10 @@ class ConsultaAPITests(APITestCase):
     def test_get_consulta(self):
         response = self.client.get(self.urls['get_by_id'])
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['data'], self.consulta.data)
+        self.assertEqual(
+            parse_datetime(response.data['data']),
+            parse_datetime(str(self.consulta.data)),
+        )
 
     def test_create_consulta(self):
         consulta_nova = {
@@ -55,7 +56,7 @@ class ConsultaAPITests(APITestCase):
         response = self.client.post(self.urls['create'], consulta_nova, format= 'json')
         self.assertEqual(response.status_code, 201)
 
-    def teste_update_consulta(self):
+    def test_update_consulta(self):
         consulta_nova = {
             'data': "2029-12-22T09:30:00Z",
             'profissional': self.profissional.pk,
@@ -63,12 +64,12 @@ class ConsultaAPITests(APITestCase):
         response = self.client.put(self.urls['update'], consulta_nova, format='json') 
         self.assertEqual(response.status_code, 200)
 
-    def teste_delete_consulta(self):
+    def test_delete_consulta(self):
         response = self.client.delete(self.urls['delete']) 
         self.assertEqual(response.status_code, 202)
         self.assertFalse(Consulta.objects.filter(pk=self.consulta.pk).exists())
 
-    def teste_create_consulta_rejects_missing_data(self):
+    def test_create_consulta_rejects_missing_data(self):
         qts_consultas_antes = Consulta.objects.count()
         data = {
             'data': "2029-12-22T09:30:00Z",
@@ -81,7 +82,7 @@ class ConsultaAPITests(APITestCase):
         self.assertIn('data', response.data)
         self.assertEqual(Consulta.objects.count(), qts_consultas_antes)
 
-    def teste_crete_consulta_missing_profissional(self):
+    def test_create_consulta_missing_profissional(self):
         qts_consultas_antes = Consulta.objects.count()
         data = {
             'data': "2029-12-22T09:30:10Z",
@@ -94,7 +95,7 @@ class ConsultaAPITests(APITestCase):
         self.assertIn('profissional', response.data)
         self.assertEqual(Consulta.objects.count(), qts_consultas_antes)
 
-    def teste_create_consulta_rejects_invalid_data(self):
+    def test_create_consulta_rejects_invalid_data(self):
         qts_consultas_antes = Consulta.objects.count()
         data = {
             'data': "texto, não data",
@@ -106,7 +107,7 @@ class ConsultaAPITests(APITestCase):
         self.assertIn('data', response.data)
         self.assertEqual(Consulta.objects.count(), qts_consultas_antes)
 
-    def teste_crete_consulta_rejects_invalid_profissional(self):
+    def test_create_consulta_rejects_invalid_profissional(self):
         qts_consultas_antes = Consulta.objects.count()
         data = {
             'data': "2029-12-22T09:30:10Z",
@@ -133,3 +134,27 @@ class ConsultaAPITests(APITestCase):
         response = self.client.get(reverse('get_all_consultas'), {'nome_profissional': 'silva'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
+
+    def test_consulta_list_filters_by_profissional_id(self):
+        outro_profissional = Profissional.objects.create(
+            nome='Maria Souza',
+            profissao='Dermatologista',
+            endereco='Rua Secundária, 45',
+            contato='maria@example.com',
+        )
+        Consulta.objects.create(
+            data=parse_datetime('2026-11-14T10:00:00Z'),
+            profissional=outro_profissional,
+        )
+
+        response = self.client.get(
+            self.urls['get_all'],
+            {'profissional': self.profissional.pk},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            response.data[0]['info_profissional']['id'],
+            self.profissional.pk,
+        )

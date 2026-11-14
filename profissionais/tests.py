@@ -29,17 +29,17 @@ class ProfissionalAPITests(APITestCase):
     
             self.client.force_authenticate(user=self.user)
 
-    def teste_get_all(self):
+    def test_get_all(self):
         response = self.client.get(self.urls['get_all'])
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
-    def teste_get_by_id(self):
+    def test_get_by_id(self):
         response = self.client.get(self.urls['get_by_id'])
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['nome'], self.profissional.nome)
 
-    def teste_create(self):
+    def test_create(self):
         novo_profissional = {
             'nome': "Caio Gomes",
             'profissao': "Terapeuta",
@@ -48,9 +48,9 @@ class ProfissionalAPITests(APITestCase):
         }
         
         response = self.client.post(self.urls['create'], novo_profissional, format='json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
-    def teste_update(self):
+    def test_update(self):
         novo_profissional = {
             'nome': "João Silva",
             'profissao': "Cardiologista",
@@ -61,12 +61,23 @@ class ProfissionalAPITests(APITestCase):
         response = self.client.put(self.urls['update'], novo_profissional, format='json') 
         self.assertEqual(response.status_code, 200)
 
-    def teste_delete(self):
+    def test_delete(self):
         response = self.client.delete(self.urls['delete']) 
         self.assertEqual(response.status_code, 202)
-        self.assertFalse(Consulta.objects.filter(pk=self.profissional.pk).exists())
+        self.assertFalse(Profissional.objects.filter(pk=self.profissional.pk).exists())
+
+    def test_delete_profissional_with_consultas_returns_conflict(self):
+        Consulta.objects.create(
+            data= "2026-11-13T14:30:00Z",
+            profissional= self.profissional,
+        )
+
+        response = self.client.delete(self.urls['delete'])
+
+        self.assertEqual(response.status_code, 409)
+        self.assertTrue(Profissional.objects.filter(pk=self.profissional.pk).exists())
  
-    def testt_create_rejects_missing_required_field(self):
+    def test_create_rejects_missing_required_field(self):
         novo_profissional = {
                     'nome': "Pedro Silva",
                     'profissao': "Radiologista",
