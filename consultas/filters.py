@@ -8,7 +8,7 @@ class ConsultaFilter(django_filters.FilterSet):
     profissional = django_filters.NumberFilter(field_name='profissional_id')
 
     nome_profissional = django_filters.CharFilter(
-        field_name='profissional__nome',
+        field_name='profissional__nome_social',
         lookup_expr='icontains',
     )
     profissao_profissional = django_filters.CharFilter(

@@ -14,7 +14,7 @@ class ConsultaAPITests(APITestCase):
                                         password="SenhaTeste@P1"
                                     )
         self.profissional = Profissional.objects.create(
-                                        nome="João Silva",
+                                        nome_social="João Silva",
                                         profissao="Cardiologista",
                                         endereco="Rua Principal, 123",
                                         contato="js@gmail.com"
@@ -137,7 +137,7 @@ class ConsultaAPITests(APITestCase):
 
     def test_consulta_list_filters_by_profissional_id(self):
         outro_profissional = Profissional.objects.create(
-            nome='Maria Souza',
+            nome_social='Maria Souza',
             profissao='Dermatologista',
             endereco='Rua Secundária, 45',
             contato='maria@example.com',
@@ -151,7 +151,6 @@ class ConsultaAPITests(APITestCase):
             self.urls['get_all'],
             {'profissional': self.profissional.pk},
         )
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(

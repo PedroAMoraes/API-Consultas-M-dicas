@@ -4,8 +4,8 @@ from .models import Profissional
 
 class ProfissionalFilter(django_filters.FilterSet):
     
-    nome = django_filters.CharFilter(
-        field_name= 'nome',
+    nome_social = django_filters.CharFilter(
+        field_name= 'nome_social',
         lookup_expr='icontains',
     )
     profissao = django_filters.CharFilter(
@@ -17,6 +17,6 @@ class ProfissionalFilter(django_filters.FilterSet):
 
     class Meta:
         model = Profissional
-        fields = ['nome', 'profissao']
+        fields = ['nome_social', 'profissao']
 
         

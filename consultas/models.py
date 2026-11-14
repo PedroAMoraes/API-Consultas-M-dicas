@@ -6,4 +6,4 @@ class Consulta(models.Model):
     profissional = models.ForeignKey(Profissional, on_delete=models.PROTECT, related_name='consultas')
 
     def __str__(self):
-        return self.profissional.nome
+        return self.profissional.nome_social

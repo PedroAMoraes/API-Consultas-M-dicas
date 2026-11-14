@@ -13,7 +13,7 @@ class ProfissionalAPITests(APITestCase):
                                             password="SenhaTeste@P1"
                                         )
             self.profissional = Profissional.objects.create(
-                                            nome="João Silva",
+                                            nome_social="João Silva",
                                             profissao="Cardiologista",
                                             endereco="Rua Principal, 123",
                                             contato="js@gmail.com"
@@ -37,11 +37,11 @@ class ProfissionalAPITests(APITestCase):
     def test_get_by_id(self):
         response = self.client.get(self.urls['get_by_id'])
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['nome'], self.profissional.nome)
+        self.assertEqual(response.data['nome_social'], self.profissional.nome_social)
 
     def test_create(self):
         novo_profissional = {
-            'nome': "Caio Gomes",
+            'nome_social': "Caio Gomes",
             'profissao': "Terapeuta",
             'endereco': "Avenida Tiradentes, 230",
             'contato': "drgomes@email.com"
@@ -52,7 +52,7 @@ class ProfissionalAPITests(APITestCase):
 
     def test_update(self):
         novo_profissional = {
-            'nome': "João Silva",
+            'nome_social': "João Silva",
             'profissao': "Cardiologista",
             'endereco': "Rua Principal, 123",
             'contato': "drjoao@gmail.com"  
@@ -79,17 +79,17 @@ class ProfissionalAPITests(APITestCase):
  
     def test_create_rejects_missing_required_field(self):
         novo_profissional = {
-                    'nome': "Pedro Silva",
+                    'nome_social': "Pedro Silva",
                     'profissao': "Radiologista",
                     'endereco': "Rua Nova, 123",
                     'contato': "pds@gmail.com"  
                     }
-        del novo_profissional['nome']
+        del novo_profissional['nome_social']
 
         response = self.client.post(self.urls['create'], novo_profissional, format='json')
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn('nome', response.data)
+        self.assertIn('nome_social', response.data)
         self.assertEqual(Profissional.objects.count(), 1)
 
     def test_list_rejects_unknown_filter(self):
@@ -100,13 +100,13 @@ class ProfissionalAPITests(APITestCase):
 
     def test_profissional_list_filters_by_name(self):
         Profissional.objects.create(
-            nome="Paulo Gustavo",
+            nome_social="Paulo Gustavo",
             profissao="Dentista",
             endereco="Rua Principal, 123",
             contato="paulogu@gmail.com"
         )
 
-        response = self.client.get(self.urls['get_all'], {'nome': 'silva'})
+        response = self.client.get(self.urls['get_all'], {'nome_social': 'silva'})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([item['nome'] for item in response.data], ['João Silva'])
+        self.assertEqual([item['nome_social'] for item in response.data], ['João Silva'])
