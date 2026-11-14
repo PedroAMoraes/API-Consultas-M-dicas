@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "drf_api_logger",
     'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
     'profissionais',
     'consultas',
 ]
