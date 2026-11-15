@@ -104,7 +104,7 @@ DATABASES = {
         'NAME': required_env('DB_NAME'),
         'USER': required_env('DB_USER'),
         'PASSWORD': required_env('DB_PASSWORD'),
-        'HOST': required_env('DB_HOST'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
